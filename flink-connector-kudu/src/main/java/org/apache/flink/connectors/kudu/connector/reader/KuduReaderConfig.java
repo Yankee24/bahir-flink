@@ -16,16 +16,15 @@
  */
 package org.apache.flink.connectors.kudu.connector.reader;
 
-import org.apache.flink.annotation.PublicEvolving;
-
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.flink.annotation.PublicEvolving;
 
 import java.io.Serializable;
 
 import static org.apache.flink.util.Preconditions.checkNotNull;
 
 /**
- * Configuration used by {@link org.apache.flink.connectors.kudu.batch.KuduRowInputFormat}. Specifies connection and other necessary properties.
+ * Configuration used by {@link org.apache.flink.connectors.kudu.format.KuduRowInputFormat}. Specifies connection and other necessary properties.
  */
 @PublicEvolving
 public class KuduReaderConfig implements Serializable {

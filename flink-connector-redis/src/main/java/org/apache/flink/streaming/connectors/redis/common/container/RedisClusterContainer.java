@@ -47,14 +47,7 @@ public class RedisClusterContainer implements RedisCommandsContainer, Closeable 
     }
 
     @Override
-    public void open() throws Exception {
-
-        // echo() tries to open a connection and echos back the
-        // message passed as argument. Here we use it to monitor
-        // if we can communicate with the cluster.
-
-        jedisCluster.echo("Test");
-    }
+    public void open() throws Exception {}
 
     @Override
     public void hset(final String key, final String hashField, final String value, final Integer ttl) {
@@ -83,6 +76,19 @@ public class RedisClusterContainer implements RedisCommandsContainer, Closeable 
             if (LOG.isErrorEnabled()) {
                 LOG.error("Cannot send Redis message with command HINCRBY to hash {} of key {} error message {}",
                         hashField, key, e.getMessage());
+            }
+            throw e;
+        }
+    }
+
+    @Override
+    public void hdel(String key, String hashField) {
+        try {
+            jedisCluster.hdel(key, hashField);
+        } catch (Exception e) {
+            if (LOG.isErrorEnabled()) {
+                LOG.error("Cannot send Redis message with command HDEL to hash {} of key {} error message {}",
+                    hashField, key, e.getMessage());
             }
             throw e;
         }
@@ -121,6 +127,19 @@ public class RedisClusterContainer implements RedisCommandsContainer, Closeable 
         } catch (Exception e) {
             if (LOG.isErrorEnabled()) {
                 LOG.error("Cannot send Redis message with command RPUSH to set {} error message {}",
+                    setName, e.getMessage());
+            }
+            throw e;
+        }
+    }
+
+    @Override
+    public void srem(final String setName, final String value) {
+        try {
+            jedisCluster.srem(setName, value);
+        } catch (Exception e) {
+            if (LOG.isErrorEnabled()) {
+                LOG.error("Cannot send Redis message with command SREM to set {} error message {}",
                     setName, e.getMessage());
             }
             throw e;

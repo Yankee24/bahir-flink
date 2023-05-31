@@ -24,7 +24,6 @@ import org.apache.flink.connectors.kudu.connector.writer.KuduWriterConfig;
 import org.apache.flink.connectors.kudu.connector.writer.RowOperationMapper;
 import org.apache.flink.streaming.api.operators.StreamingRuntimeContext;
 import org.apache.flink.types.Row;
-
 import org.apache.kudu.ColumnSchema;
 import org.apache.kudu.Type;
 import org.apache.kudu.client.CreateTableOptions;
@@ -59,15 +58,14 @@ public class KuduSinkTest extends KuduTestBase {
 
     @Test
     void testInvalidTableInfo() {
-        harness.getClient();
-        String masterAddresses = harness.getMasterAddressesAsString();
+        String masterAddresses = getMasterAddress();
         KuduWriterConfig writerConfig = KuduWriterConfig.Builder.setMasters(masterAddresses).build();
         Assertions.assertThrows(NullPointerException.class, () -> new KuduSink<>(writerConfig, null, new RowOperationMapper(columns, AbstractSingleOperationMapper.KuduOperation.INSERT)));
     }
 
     @Test
     void testNotTableExist() {
-        String masterAddresses = harness.getMasterAddressesAsString();
+        String masterAddresses = getMasterAddress();
         KuduTableInfo tableInfo = booksTableInfo(UUID.randomUUID().toString(), false);
         KuduWriterConfig writerConfig = KuduWriterConfig.Builder.setMasters(masterAddresses).build();
         KuduSink<Row> sink = new KuduSink<>(writerConfig, tableInfo, new RowOperationMapper(columns, AbstractSingleOperationMapper.KuduOperation.INSERT));
@@ -78,7 +76,7 @@ public class KuduSinkTest extends KuduTestBase {
 
     @Test
     void testOutputWithStrongConsistency() throws Exception {
-        String masterAddresses = harness.getMasterAddressesAsString();
+        String masterAddresses = getMasterAddress();
 
         KuduTableInfo tableInfo = booksTableInfo(UUID.randomUUID().toString(), true);
         KuduWriterConfig writerConfig = KuduWriterConfig.Builder
@@ -102,7 +100,7 @@ public class KuduSinkTest extends KuduTestBase {
 
     @Test
     void testOutputWithEventualConsistency() throws Exception {
-        String masterAddresses = harness.getMasterAddressesAsString();
+        String masterAddresses = getMasterAddress();
 
         KuduTableInfo tableInfo = booksTableInfo(UUID.randomUUID().toString(), true);
         KuduWriterConfig writerConfig = KuduWriterConfig.Builder
@@ -130,7 +128,7 @@ public class KuduSinkTest extends KuduTestBase {
 
     @Test
     void testSpeed() throws Exception {
-        String masterAddresses = harness.getMasterAddressesAsString();
+        String masterAddresses = getMasterAddress();
 
         KuduTableInfo tableInfo = KuduTableInfo
                 .forTable("test_speed")

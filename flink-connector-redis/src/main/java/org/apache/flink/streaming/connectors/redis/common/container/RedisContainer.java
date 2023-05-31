@@ -126,6 +126,23 @@ public class RedisContainer implements RedisCommandsContainer, Closeable {
     }
 
     @Override
+    public void hdel(String key, String hashField) {
+        Jedis jedis = null;
+        try {
+            jedis = getInstance();
+            jedis.hdel(key, hashField);
+        } catch (Exception e) {
+            if (LOG.isErrorEnabled()) {
+                LOG.error("Cannot send Redis message with command HDEL to key {} and hashField {} error message {}",
+                    key, hashField, e.getMessage());
+            }
+            throw e;
+        } finally {
+            releaseInstance(jedis);
+        }
+    }
+
+    @Override
     public void rpush(final String listName, final String value) {
         Jedis jedis = null;
         try {
@@ -150,7 +167,7 @@ public class RedisContainer implements RedisCommandsContainer, Closeable {
             jedis.lpush(listName, value);
         } catch (Exception e) {
             if (LOG.isErrorEnabled()) {
-                LOG.error("Cannot send Redis message with command LUSH to list {} error message {}",
+                LOG.error("Cannot send Redis message with command LPUSH to list {} error message {}",
                     listName, e.getMessage());
             }
             throw e;
@@ -167,7 +184,24 @@ public class RedisContainer implements RedisCommandsContainer, Closeable {
             jedis.sadd(setName, value);
         } catch (Exception e) {
             if (LOG.isErrorEnabled()) {
-                LOG.error("Cannot send Redis message with command RPUSH to set {} error message {}",
+                LOG.error("Cannot send Redis message with command SADD to set {} error message {}",
+                    setName, e.getMessage());
+            }
+            throw e;
+        } finally {
+            releaseInstance(jedis);
+        }
+    }
+
+    @Override
+    public void srem(final String setName, final String value) {
+        Jedis jedis = null;
+        try {
+            jedis = getInstance();
+            jedis.srem(setName, value);
+        } catch (Exception e) {
+            if (LOG.isErrorEnabled()) {
+                LOG.error("Cannot send Redis message with command SREM to set {} error message {}",
                     setName, e.getMessage());
             }
             throw e;

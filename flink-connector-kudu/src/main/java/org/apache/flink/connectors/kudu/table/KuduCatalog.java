@@ -21,29 +21,15 @@ package org.apache.flink.connectors.kudu.table;
 import org.apache.flink.annotation.PublicEvolving;
 import org.apache.flink.connectors.kudu.connector.KuduTableInfo;
 import org.apache.flink.connectors.kudu.table.utils.KuduTableUtils;
-import org.apache.flink.table.api.EnvironmentSettings;
+import org.apache.flink.shaded.guava30.com.google.common.collect.Lists;
 import org.apache.flink.table.api.TableSchema;
-import org.apache.flink.table.catalog.CatalogBaseTable;
-import org.apache.flink.table.catalog.CatalogDatabase;
-import org.apache.flink.table.catalog.CatalogDatabaseImpl;
-import org.apache.flink.table.catalog.CatalogFunction;
-import org.apache.flink.table.catalog.CatalogPartitionSpec;
-import org.apache.flink.table.catalog.CatalogTable;
-import org.apache.flink.table.catalog.CatalogTableImpl;
-import org.apache.flink.table.catalog.ObjectPath;
-import org.apache.flink.table.catalog.exceptions.CatalogException;
-import org.apache.flink.table.catalog.exceptions.DatabaseNotExistException;
-import org.apache.flink.table.catalog.exceptions.FunctionNotExistException;
-import org.apache.flink.table.catalog.exceptions.TableAlreadyExistException;
-import org.apache.flink.table.catalog.exceptions.TableNotExistException;
+import org.apache.flink.table.catalog.*;
+import org.apache.flink.table.catalog.exceptions.*;
 import org.apache.flink.table.catalog.stats.CatalogColumnStatistics;
 import org.apache.flink.table.catalog.stats.CatalogTableStatistics;
 import org.apache.flink.table.expressions.Expression;
 import org.apache.flink.table.factories.TableFactory;
 import org.apache.flink.util.StringUtils;
-
-import org.apache.flink.shaded.guava30.com.google.common.collect.Lists;
-
 import org.apache.kudu.ColumnSchema;
 import org.apache.kudu.client.AlterTableOptions;
 import org.apache.kudu.client.KuduClient;
@@ -53,26 +39,22 @@ import org.apache.kudu.shaded.com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.apache.flink.connectors.kudu.table.KuduTableFactory.KUDU_HASH_COLS;
-import static org.apache.flink.connectors.kudu.table.KuduTableFactory.KUDU_PRIMARY_KEY_COLS;
-import static org.apache.flink.connectors.kudu.table.KuduTableFactory.KUDU_REPLICAS;
+import static org.apache.flink.connectors.kudu.table.KuduTableFactory.*;
 import static org.apache.flink.util.Preconditions.checkArgument;
 import static org.apache.flink.util.Preconditions.checkNotNull;
 
 /**
  * Catalog for reading and creating Kudu tables.
+ * @deprecated After this class based on {@link KuduTableFactory},
+ *      but flink upgrade {@link org.apache.flink.connectors.kudu.table.dynamic.KuduDynamicTableSourceSinkFactory}
+ *      {@link KuduCatalog} underlying the use of TableFactory also needs to
+ *      update,So this class is replaced by the {@link org.apache.flink.connectors.kudu.table.dynamic.catalog.KuduDynamicCatalog} class
  */
 @PublicEvolving
+@Deprecated
 public class KuduCatalog extends AbstractReadOnlyCatalog {
 
     private static final Logger LOG = LoggerFactory.getLogger(KuduCatalog.class);
@@ -87,7 +69,7 @@ public class KuduCatalog extends AbstractReadOnlyCatalog {
      * @param kuduMasters Connection address to Kudu
      */
     public KuduCatalog(String catalogName, String kuduMasters) {
-        super(catalogName, EnvironmentSettings.DEFAULT_BUILTIN_DATABASE);
+        super(catalogName, "default_database");
         this.kuduMasters = kuduMasters;
         this.kuduClient = createClient();
     }

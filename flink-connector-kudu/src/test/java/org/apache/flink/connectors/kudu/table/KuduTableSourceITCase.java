@@ -41,7 +41,7 @@ public class KuduTableSourceITCase extends KuduTestBase {
         KuduTableInfo tableInfo = booksTableInfo("books", true);
         setUpDatabase(tableInfo);
         tableEnv = KuduTableTestUtils.createTableEnvWithBlinkPlannerBatchMode();
-        catalog = new KuduCatalog(harness.getMasterAddressesAsString());
+        catalog = new KuduCatalog(getMasterAddress());
         tableEnv.registerCatalog("kudu", catalog);
         tableEnv.useCatalog("kudu");
     }
@@ -53,17 +53,19 @@ public class KuduTableSourceITCase extends KuduTestBase {
         it.forEachRemaining(results::add);
         assertEquals(5, results.size());
         assertEquals("1001,Java for dummies,Tan Ah Teck,11.11,11", results.get(0).toString());
-        tableEnv.sqlUpdate("DROP TABLE books");
+        tableEnv.executeSql("DROP TABLE books");
     }
+
 
     @Test
     void testScanWithProjectionAndFilter() throws Exception {
         // (price > 30 and price < 40)
-        CloseableIterator<Row> it = tableEnv.executeSql("SELECT title FROM books WHERE id IN (1003, 1004) and quantity < 40").collect();
+        CloseableIterator<Row> it = tableEnv.executeSql("SELECT title FROM books WHERE id IN (1003, 1004) and " +
+                "quantity < 40").collect();
         List<Row> results = new ArrayList<>();
         it.forEachRemaining(results::add);
         assertEquals(1, results.size());
         assertEquals("More Java for more dummies", results.get(0).toString());
-        tableEnv.sqlUpdate("DROP TABLE books");
+        tableEnv.executeSql("DROP TABLE books");
     }
 }

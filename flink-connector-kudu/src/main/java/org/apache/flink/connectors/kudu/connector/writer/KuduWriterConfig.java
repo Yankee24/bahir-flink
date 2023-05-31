@@ -16,9 +16,8 @@
  */
 package org.apache.flink.connectors.kudu.connector.writer;
 
-import org.apache.flink.annotation.PublicEvolving;
-
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.flink.annotation.PublicEvolving;
 import org.apache.kudu.client.AsyncKuduClient;
 
 import java.io.Serializable;
@@ -28,7 +27,7 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
 import static org.apache.kudu.client.SessionConfiguration.FlushMode;
 
 /**
- * Configuration used by {@link org.apache.flink.connectors.kudu.streaming.KuduSink} and {@link org.apache.flink.connectors.kudu.batch.KuduOutputFormat}.
+ * Configuration used by {@link org.apache.flink.connectors.kudu.streaming.KuduSink} and {@link org.apache.flink.connectors.kudu.format.KuduOutputFormat}.
  * Specifies connection and other necessary properties.
  */
 @PublicEvolving

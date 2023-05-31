@@ -17,11 +17,12 @@
  */
 package org.apache.flink.streaming.connectors.influxdb.sink;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import org.apache.flink.streaming.connectors.influxdb.util.InfluxDBContainer;
-import org.apache.flink.streaming.connectors.influxdb.util.InfluxDBTestSerializer;
+import org.apache.flink.streaming.connectors.influxdb.sink.writer.InfluxDBTestSerializer;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 
 class InfluxDBSinkBuilderTest {
 
@@ -33,44 +34,65 @@ class InfluxDBSinkBuilderTest {
                         () ->
                                 InfluxDBSink.builder()
                                         .setInfluxDBSchemaSerializer(new InfluxDBTestSerializer())
-                                        .setInfluxDBUsername(InfluxDBContainer.username)
-                                        .setInfluxDBPassword(InfluxDBContainer.password)
-                                        .setInfluxDBBucket(InfluxDBContainer.bucket)
-                                        .setInfluxDBOrganization(InfluxDBContainer.organization)
+                                        .setInfluxDBUsername("username")
+                                        .setInfluxDBPassword("password")
+                                        .setInfluxDBBucket("bucket")
+                                        .setInfluxDBOrganization("organization")
                                         .build());
         assertEquals(exception.getMessage(), "The InfluxDB URL is required but not provided.");
     }
 
     @Test
-    void shouldNotBuildSinkWhenUsernameIsNotProvided() {
-        final NullPointerException exception =
+    void shouldNotBuildSinkWhenTokenNotProvidedAndUsernameIsNotProvided() {
+        final IllegalArgumentException exception =
                 assertThrows(
-                        NullPointerException.class,
+                        IllegalArgumentException.class,
                         () ->
                                 InfluxDBSink.builder()
                                         .setInfluxDBUrl("http://localhost:8086")
-                                        .setInfluxDBPassword(InfluxDBContainer.password)
-                                        .setInfluxDBBucket(InfluxDBContainer.bucket)
-                                        .setInfluxDBOrganization(InfluxDBContainer.organization)
+                                        .setInfluxDBPassword("password")
+                                        .setInfluxDBBucket("bucket")
+                                        .setInfluxDBOrganization("organization")
                                         .setInfluxDBSchemaSerializer(new InfluxDBTestSerializer())
                                         .build());
-        assertEquals(exception.getMessage(), "The InfluxDB username is required but not provided.");
+        assertEquals(exception.getMessage(),
+                "Either the InfluxDB username and password or InfluxDB token are required but neither provided");
     }
 
     @Test
-    void shouldNotBuildSinkWhenPasswordIsNotProvided() {
-        final NullPointerException exception =
+    void shouldNotBuildSinkWhenTokenNotProvidedAndPasswordIsNotProvided() {
+        final IllegalArgumentException exception =
                 assertThrows(
-                        NullPointerException.class,
+                        IllegalArgumentException.class,
                         () ->
                                 InfluxDBSink.builder()
                                         .setInfluxDBUrl("http://localhost:8086")
-                                        .setInfluxDBUsername(InfluxDBContainer.username)
-                                        .setInfluxDBBucket(InfluxDBContainer.bucket)
-                                        .setInfluxDBOrganization(InfluxDBContainer.organization)
+                                        .setInfluxDBUsername("username")
+                                        .setInfluxDBBucket("bucket")
+                                        .setInfluxDBOrganization("organization")
                                         .setInfluxDBSchemaSerializer(new InfluxDBTestSerializer())
                                         .build());
-        assertEquals(exception.getMessage(), "The InfluxDB password is required but not provided.");
+        assertEquals(exception.getMessage(),
+                "Either the InfluxDB username and password or InfluxDB token are required but neither provided");
+    }
+
+    @Test
+    void shouldNotBuildSinkWhenTokenProvidedAndUsernamePasswordIsProvided() {
+        final IllegalArgumentException exception =
+                assertThrows(
+                        IllegalArgumentException.class,
+                        () ->
+                                InfluxDBSink.builder()
+                                        .setInfluxDBUrl("http://localhost:8086")
+                                        .setInfluxDBToken("token")
+                                        .setInfluxDBUsername("username")
+                                        .setInfluxDBPassword("password")
+                                        .setInfluxDBBucket("bucket")
+                                        .setInfluxDBOrganization("organization")
+                                        .setInfluxDBSchemaSerializer(new InfluxDBTestSerializer())
+                                        .build());
+        assertEquals(exception.getMessage(),
+                "Either the InfluxDB username and password or InfluxDB token are required but both provided");
     }
 
     @Test
@@ -81,9 +103,9 @@ class InfluxDBSinkBuilderTest {
                         () ->
                                 InfluxDBSink.builder()
                                         .setInfluxDBUrl("http://localhost:8086")
-                                        .setInfluxDBUsername(InfluxDBContainer.username)
-                                        .setInfluxDBPassword(InfluxDBContainer.password)
-                                        .setInfluxDBOrganization(InfluxDBContainer.organization)
+                                        .setInfluxDBUsername("username")
+                                        .setInfluxDBPassword("password")
+                                        .setInfluxDBOrganization("organization")
                                         .setInfluxDBSchemaSerializer(new InfluxDBTestSerializer())
                                         .build());
         assertEquals(exception.getMessage(), "The Bucket name is required but not provided.");
@@ -97,9 +119,9 @@ class InfluxDBSinkBuilderTest {
                         () ->
                                 InfluxDBSink.builder()
                                         .setInfluxDBUrl("http://localhost:8086")
-                                        .setInfluxDBUsername(InfluxDBContainer.username)
-                                        .setInfluxDBPassword(InfluxDBContainer.password)
-                                        .setInfluxDBBucket(InfluxDBContainer.bucket)
+                                        .setInfluxDBUsername("username")
+                                        .setInfluxDBPassword("password")
+                                        .setInfluxDBBucket("bucket")
                                         .setInfluxDBSchemaSerializer(new InfluxDBTestSerializer())
                                         .build());
         assertEquals(exception.getMessage(), "The Organization name is required but not provided.");
@@ -113,10 +135,10 @@ class InfluxDBSinkBuilderTest {
                         () ->
                                 InfluxDBSink.builder()
                                         .setInfluxDBUrl("http://localhost:8086")
-                                        .setInfluxDBUsername(InfluxDBContainer.username)
-                                        .setInfluxDBPassword(InfluxDBContainer.password)
-                                        .setInfluxDBBucket(InfluxDBContainer.bucket)
-                                        .setInfluxDBOrganization(InfluxDBContainer.organization)
+                                        .setInfluxDBUsername("username")
+                                        .setInfluxDBPassword("password")
+                                        .setInfluxDBBucket("bucket")
+                                        .setInfluxDBOrganization("organization")
                                         .build());
         assertEquals(exception.getMessage(), "Serialization schema is required but not provided.");
     }

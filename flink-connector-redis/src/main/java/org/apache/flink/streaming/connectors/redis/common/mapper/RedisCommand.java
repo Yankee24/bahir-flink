@@ -40,6 +40,11 @@ public enum RedisCommand {
     SADD(RedisDataType.SET),
 
     /**
+     * Remove the specified members from the set stored at key.
+     */
+    SREM(RedisDataType.SET),
+
+    /**
      * Set key to hold the string value. If key already holds a value,
      * it is overwritten, regardless of its type.
      */
@@ -78,6 +83,12 @@ public enum RedisCommand {
      * a new key holding a hash is created. If field already exists in the hash, it is overwritten.
      */
     HSET(RedisDataType.HASH),
+
+    /**
+     * Removes the specified field from the hash stored at key.
+     * Specified fields that do not exist within this hash are ignored.
+     */
+    HDEL(RedisDataType.HASH),
 
     HINCRBY(RedisDataType.HINCRBY),
 
